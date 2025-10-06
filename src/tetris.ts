@@ -1,257 +1,20 @@
-type TetrisCellState = "red" | "green" | "blue" | "yellow" | "purple" | "orange" | "cyan" | false;
+import {TetrisCellState, Tetromino, TetrominoRotation, TETROMINOS} from "./dominos";
 
-type TetrominoType = {
-    shape: boolean[][][],
-    pivot: {
-        x: number,
-        y: number,
-    },
-    state: TetrisCellState,
-}
-
-type Tetrominos = {
-    [name: string]: TetrominoType
-}
-
-enum TetrominoRotation {
-    UP = 0,
-    RIGHT = 1,
-    DOWN = 2,
-    LEFT = 3,
-    ROT_MAX = 4,
-}
-
-const TETROMINOS: Tetrominos = {
-    "T": {
-        shape: [
-            [
-                [false, true, false],
-                [true, true, true],
-                [false, false, false],
-            ],
-            [
-                [false, true, false],
-                [false, true, true],
-                [false, true, false],
-            ],
-            [
-                [false, false, false],
-                [true, true, true],
-                [false, true, false],
-            ],
-            [
-                [false, true, false],
-                [true, true, false],
-                [false, true, false],
-            ],
-        ],
-        pivot: { x: 1, y: 1 },
-        state: "purple",
-    },
-    "J": {
-        shape: [
-            [
-                [true, false, false],
-                [true, true, true],
-                [false, false, false],
-            ],
-            [
-                [false, true, true],
-                [false, true, false],
-                [false, true, false],
-            ],
-            [
-                [false, false, false],
-                [true, true, true],
-                [false, false, true],
-            ],
-            [
-                [false, true, false],
-                [false, true, false],
-                [true, true, false],
-            ],
-        ],
-        pivot: { x: 1, y: 1 },
-        state: "blue",
-    },
-    "L": {
-        shape: [
-            [
-                [false, false, true],
-                [true, true, true],
-                [false, false, false],
-            ],
-            [
-                [false, true, false],
-                [false, true, false],
-                [false, true, true],
-            ],
-            [
-                [false, false, false],
-                [true, true, true],
-                [true, false, false],
-            ],
-            [
-                [true, true, false],
-                [false, true, false],
-                [false, true, false],
-            ],
-        ],
-        pivot: { x: 1, y: 1 },
-        state: "orange",
-    },
-    "Z": {
-        shape: [
-            [
-                [false, true, true],
-                [true, true, false],
-                [false, false, false],
-            ],
-            [
-                [false, true, false],
-                [false, true, true],
-                [false, false, true],
-            ],
-            [
-                [false, false, false],
-                [false, true, true],
-                [true, true, false],
-            ],
-            [
-                [true, false, false],
-                [true, true, false],
-                [false, true, false],
-            ],
-        ],
-        pivot: { x: 1, y: 1 },
-        state: "green",
-    },
-    "S": {
-        shape: [
-            [
-                [true, true, false],
-                [false, true, true],
-                [false, false, false],
-            ],
-            [
-                [false, false, true],
-                [false, true, true],
-                [false, true, false],
-            ],
-            [
-                [false, false, false],
-                [true, true, false],
-                [false, true, true],
-            ],
-            [
-                [false, true, false],
-                [true, true, false],
-                [true, false, false],
-            ],
-        ],
-        pivot: { x: 1, y: 1 },
-        state: "red",
-    },
-    "O": {
-        shape: [
-            [
-                [true, true, false],
-                [true, true, false],
-                [false, false, false],
-            ],
-            [
-                [true, true, false],
-                [true, true, false],
-                [false, false, false],
-            ],
-            [
-                [true, true, false],
-                [true, true, false],
-                [false, false, false],
-            ],
-            [
-                [true, true, false],
-                [true, true, false],
-                [false, false, false],
-            ],
-        ],
-        pivot: { x: 0, y: 0 },
-        state: "yellow",
-    },
-    "I": {
-        shape: [
-            [
-                [false, false, false, false],
-                [true, true, true, true],
-                [false, false, false, false],
-                [false, false, false, false],
-            ],
-            [
-                [false, false, true, false],
-                [false, false, true, false],
-                [false, false, true, false],
-                [false, false, true, false],
-            ],
-            [
-                [false, false, false, false],
-                [false, false, false, false],
-                [true, true, true, true],
-                [false, false, false, false],
-            ],
-            [
-                [false, true, false, false],
-                [false, true, false, false],
-                [false, true, false, false],
-                [false, true, false, false],
-            ],
-        ],
-        pivot: { x: 1, y: 1 },
-        state: "cyan",
-    },
-
-}
-
-class Tetromino {
-    public type: TetrominoType;
-    public rotation: TetrominoRotation;
-    public x: number;
-    public y: number;
-
-    public constructor(type: TetrominoType, rotation: TetrominoRotation, x: number, y: number) {
-        this.type = type;
-        this.rotation = rotation;
-        this.x = x;
-        this.y = y;
-    }
-
-    public heigth() {
-        return this.type.shape[this.rotation].length;
-    }
-
-    public width() {
-        let width = 0;
-        for (let i = 0; i < this.heigth(); i++) {
-            if (width < this.type.shape[this.rotation][i].length) {
-                width = this.type.shape[this.rotation][i].length;
-            }
-        }
-        return width;
-    }
-
-    public cell_coords(y: number, x: number) {
-        return {
-            y: this.y + y - this.type.pivot.y,
-            x: this.x + x - this.type.pivot.x,
-        }
-    }
-}
+type TetrisState = {
+    current_tetr: Tetromino;
+    cells: TetrisCellState[][];
+};
 
 class TetrisGame {
     public static WIDTH = 10;
     public static HEIGHT = 40;
 
+    private static SHAPE_NAMES = [ "T", "I", "J", "L", "Z", "S", "O" ];
+
     private cells: TetrisCellState[][];
     private cur_tetr: Tetromino;
+
+    private pause = false;
 
     constructor() {
         this.cells = Array.from({length: TetrisGame.HEIGHT}, () => Array(TetrisGame.WIDTH).fill(false));
@@ -259,8 +22,7 @@ class TetrisGame {
     }
 
     public new_tetromino() {
-        const SHAPES = [ "T", "I", "J", "L", "Z", "S", "O" ];
-        const randShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+        const randShape = TetrisGame.SHAPE_NAMES[Math.floor(Math.random() * TetrisGame.SHAPE_NAMES.length)];
         //const randShape = "T";
         this.cur_tetr = new Tetromino(
             TETROMINOS[randShape],
@@ -270,55 +32,99 @@ class TetrisGame {
         );
     }
 
-    public draw_current_tetromino(cells: TetrisCellState[][]) {
+    public fix_tetromino() {
         for (let i = 0; i < this.cur_tetr.heigth(); i++) {
             for (let j = 0; j < this.cur_tetr.width(); j++) {
                 const { y, x } = this.cur_tetr.cell_coords(i, j);
-                if (y < cells.length && x < cells[y].length) {
+                if (y < this.cells.length && x < this.cells[y].length) {
                     if (this.cur_tetr.type.shape[this.cur_tetr.rotation][i][j] != false) {
-                        cells[y][x] = this.cur_tetr.type.state;
+                        this.cells[y][x] = this.cur_tetr.type.state;
                     }
                 }
             }
         }
     }
 
-    public fix_tetromino() {
-        this.draw_current_tetromino(this.cells);
-    }
-
-    public get_cells() : TetrisCellState[][] {
-        const cells = this.cells.map(row => row.slice());
-        this.draw_current_tetromino(cells);
-        return cells;
+    public get_state() : TetrisState {
+        return {
+            current_tetr: this.cur_tetr,
+            cells: this.cells,
+        };
     }
 
     public can_movedown(): boolean {
-        let can_move = true;
-        this.cur_tetr.y++;
+        const tetr_w = this.cur_tetr.type.dimensions.w;
+        const tetr_h = this.cur_tetr.type.dimensions.h;
         const shape = this.cur_tetr.type.shape[this.cur_tetr.rotation];
 
-        for (let i = 0; i < this.cur_tetr.heigth(); i++) {
-            for (let j = 0; j < this.cur_tetr.width(); j++) {
-                const { y, x } = this.cur_tetr.cell_coords(i, j);
+        for (let i = tetr_h - 1; i >= 0; i--) {
+            for (let j = 0; j < tetr_w; j++) {
                 if (shape[i][j] != false) {
-                    if (y >= TetrisGame.HEIGHT || this.cells[y][x] != false) {
-                        can_move = false;
+                    const { x, y } = this.cur_tetr.cell_coords(i, j);
+                    if (y >= TetrisGame.HEIGHT - 1) {
+                        return false;
+                    }
+                    if (this.cells[y + 1][x] != false) {
+                        return false;
                     }
                 }
             }
         }
+        return true;
+    }
 
-        this.cur_tetr.y--;
-        return can_move;
+    public can_moveleft(): boolean {
+        const tetr_w = this.cur_tetr.type.dimensions.w;
+        const tetr_h = this.cur_tetr.type.dimensions.h;
+        const shape = this.cur_tetr.type.shape[this.cur_tetr.rotation];
+
+        for (let i = 0; i < tetr_h; i++) {
+            for (let j = 0; j < tetr_w; j++) {
+                if (shape[i][j] != false) {
+                    const {x, y} = this.cur_tetr.cell_coords(i, j);
+                    if (x == 0) {
+                        return false;
+                    }
+                    if (this.cells[y][x - 1] != false) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    public can_moveright(): boolean {
+        const tetr_w = this.cur_tetr.type.dimensions.w;
+        const tetr_h = this.cur_tetr.type.dimensions.h;
+        const shape = this.cur_tetr.type.shape[this.cur_tetr.rotation];
+
+        for (let i = tetr_h - 1; i >= 0; i--) {
+            for (let j = tetr_w - 1; j >= 0; j--) {
+                if (shape[i][j] != false) {
+                    const {x, y} = this.cur_tetr.cell_coords(i, j);
+                    if (x == TetrisGame.WIDTH - 1) {
+                        return false;
+                    }
+                    if (this.cells[y][x + 1] != false) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public tick(){
-        this.cur_tetr.y++;
+        if (this.pause) {
+            return;
+        }
 
         if (!this.can_movedown()) {
             this.fix_tetromino();
             this.new_tetromino();
+        }
+        else {
+            this.down();
         }
     }
 
@@ -327,22 +133,26 @@ class TetrisGame {
     }
 
     public left() {
-        this.cur_tetr.x--;
+        if (this.can_moveleft()) {
+            this.cur_tetr.x--;
+        }
     }
 
     public right() {
-        this.cur_tetr.x++;
+        if (this.can_moveright()) {
+            this.cur_tetr.x++;
+        }
     }
 
     public down() {
         if (this.can_movedown()) {
             this.cur_tetr.y++;
         }
-        else {
-            this.fix_tetromino();
-            this.new_tetromino();
-        }
+    }
+
+    public pause_switch() {
+        this.pause = !this.pause;
     }
 }
 
-export { TetrisGame, TetrisCellState };
+export { TetrisGame, TetrisCellState, TetrisState };
