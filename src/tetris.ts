@@ -93,6 +93,7 @@ class TetrisGame {
         }
         return true;
     }
+
     public can_moveright(): boolean {
         const tetr_w = this.cur_tetr.type.dimensions.w;
         const tetr_h = this.cur_tetr.type.dimensions.h;
@@ -114,6 +115,43 @@ class TetrisGame {
         return true;
     }
 
+    public check_lines(): boolean[] {
+        const lines_ok = new Array<boolean>(TetrisGame.HEIGHT);
+        for (let i = 0; i < TetrisGame.HEIGHT; i++) {
+            let line_ok = true;
+            for (let j = 0; j < TetrisGame.WIDTH; j++) {
+                if (this.cells[i][j] == false) {
+                    line_ok = false;
+                    break;
+                }
+            }
+            lines_ok[i] = line_ok;
+        }
+        return lines_ok;
+    }
+
+    public lines_score(lines_ok: Array<boolean>): number {
+        const scoresLevels = [0, 100, 300, 500, 800];
+        let score = 0;
+        let chain = 0;
+        for (let i = lines_ok.length - 1; i >= 0; i--) {
+            if (lines_ok[i]) {
+                chain++;
+            }
+            else {
+                if (chain > 0 && chain <= 4) {
+                    score += scoresLevels[chain];
+                }
+                chain = 0;
+            }
+        }
+        // Last group is not handled by loop
+        if (chain > 0 && chain <= 4) {
+            score += scoresLevels[chain];
+        }
+        return score;
+    }
+
     public tick(){
         if (this.pause) {
             return;
@@ -126,6 +164,8 @@ class TetrisGame {
         else {
             this.down();
         }
+        const score = this.lines_score(this.check_lines())
+        console.log(score);
     }
 
     public rotate() {

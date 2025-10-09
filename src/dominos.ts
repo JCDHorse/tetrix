@@ -1,4 +1,4 @@
-type TetrisCellState = "red" | "green" | "blue" | "yellow" | "purple" | "orange" | "cyan" | false;
+type TetrisCellState = "red" | "grey" | "green" | "blue" | "yellow" | "purple" | "orange" | "cyan" | false;
 
 type TetrominoType = {
     shape: boolean[][][],

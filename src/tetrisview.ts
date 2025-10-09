@@ -53,6 +53,15 @@ export class TetrisView {
         }
     }
 
+    public draw_current_tetromino_shadow(state: TetrisState) {
+        for (let i = 0; i < state.current_tetr.type.dimensions.h; i++) {
+            for (let j = 0; j < state.current_tetr.type.dimensions.w; j++) {
+                const { y, x } = state.current_tetr.cell_coords(i, j);
+                this.drawTetrisCell(x, y, "grey");
+            }
+        }
+    }
+
     public drawTetris(game: TetrisGame) {
         // Background
         this.context.fillStyle = "black";
@@ -86,7 +95,7 @@ export class TetrisView {
         /* // Debug : show grid
         */
         this.context.strokeStyle = "grey";
-        this.context.lineWidth = 0.5;
+        this.context.lineWidth = 0.2;
         this.context.strokeRect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize);
     }
 
