@@ -3,13 +3,12 @@ import { TetrisGame, TetrisCellState } from "./tetris";
 import { TetrisView, DESIRED_WIDTH, GRID_WIDTH, GRID_HEIGHT, RATIO } from "./tetrisview";
 
 function resizeCanvas() {
-    const margin = 20;
-    const minHeight= 600;  // Taille minimale pour bien jouer
+    const margin = 0;
     const maxHeight = window.innerHeight - margin;
-
-    let height = Math.max(minHeight, Math.min(maxHeight, DESIRED_WIDTH * RATIO));
-    let width = height / RATIO;
     const maxWidth = window.innerWidth - margin;
+
+    let height= maxHeight;
+    let width = height / RATIO;
 
     if (width > maxWidth) {
         width = maxWidth;
@@ -29,16 +28,19 @@ cnvTetris.width = DESIRED_WIDTH;
 cnvTetris.height = Math.floor(DESIRED_WIDTH * RATIO);
 const body = document.querySelector('body');
 
-resizeCanvas();
 
 const tetrisGame = new TetrisGame();
 const tetris = new TetrisView(cnvTetris);
 
 window.addEventListener('resize', () => {
     resizeCanvas();
+    tetris.updateCellSize();
     tetris.drawTetris(tetrisGame);
 });
 
+
+resizeCanvas();
+tetris.updateCellSize();
 tetris.drawTetris(tetrisGame);
 
 setInterval(() => {
@@ -47,24 +49,23 @@ setInterval(() => {
 }, 500);
 
 body.addEventListener("keydown", (e) => {
-    if (e.key === 'ArrowLeft') {
-        tetrisGame.left();
-        tetris.drawTetris(tetrisGame);
+    if (!tetrisGame.get_state().started) {
+        if (e.code === 'Space') {
+            tetrisGame.start();
+        }
     }
-    else if (e.key === 'ArrowRight') {
-        tetrisGame.right();
-        tetris.drawTetris(tetrisGame);
+    else {
+        if (e.key === 'ArrowLeft') {
+            tetrisGame.left();
+        } else if (e.key === 'ArrowRight') {
+            tetrisGame.right();
+        } else if (e.key === 'ArrowDown') {
+            tetrisGame.down();
+        } else if (e.key === 'ArrowUp') {
+            tetrisGame.rotate();
+        } else if (e.code === 'Space') {
+            tetrisGame.pause_switch();
+        }
     }
-    else if (e.key === 'ArrowDown') {
-        tetrisGame.down();
-        tetris.drawTetris(tetrisGame);
-    }
-    else if (e.key === 'ArrowUp') {
-        tetrisGame.rotate();
-        tetris.drawTetris(tetrisGame);
-    }
-    else if (e.code === 'Space') {
-        tetrisGame.pause_switch();
-        tetris.drawTetris(tetrisGame);
-    }
+    tetris.drawTetris(tetrisGame);
 })

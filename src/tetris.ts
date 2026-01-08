@@ -1,6 +1,9 @@
 import {TetrisCellState, Tetromino, TetrominoRotation, TETROMINOS} from "./dominos";
 
 type TetrisState = {
+    game_over: boolean;
+    started: boolean;
+    score: number;
     current_tetr: Tetromino;
     cells: TetrisCellState[][];
 };
@@ -14,10 +17,16 @@ class TetrisGame {
     private cells: TetrisCellState[][];
     private cur_tetr: Tetromino;
 
+    private started: boolean;
+    private game_over: boolean;
+    private score: number;
     private pause = false;
 
     constructor() {
         this.cells = Array.from({length: TetrisGame.HEIGHT}, () => Array(TetrisGame.WIDTH).fill(false));
+        this.started = false;
+        this.score = 0;
+        this.game_over = false;
         this.new_tetromino();
     }
 
@@ -49,6 +58,9 @@ class TetrisGame {
         return {
             current_tetr: this.cur_tetr,
             cells: this.cells,
+            score: this.score,
+            game_over: this.game_over,
+            started: this.started,
         };
     }
 
@@ -152,8 +164,55 @@ class TetrisGame {
         return score;
     }
 
+    public remove_line(lineIndex: number) {
+        for (let i = 0; i < TetrisGame.WIDTH; i++) {
+            this.cells[lineIndex][i] = false;
+        }
+    }
+
+    public remove_lines(lines: Array<boolean>) {
+        // Filter rows that are not full
+        const remainingRows = this.cells.filter((_, index) => !lines[index]);
+        // Count how many rows have been removed
+        const removedCount = TetrisGame.HEIGHT - remainingRows.length;
+        if (removedCount > 0) {
+            // Create new lines for the upper part of the game
+            const emptyRows = Array.from(
+                { length: removedCount },
+                () => Array(TetrisGame.WIDTH).fill(false)
+            );
+            // Rebuild the game
+            this.cells = [...emptyRows, ...remainingRows];
+        }
+    }
+
+    public is_lost(): boolean {
+        for (let i = 0; i < TetrisGame.WIDTH; i++) {
+            if (this.cells[0][i]) {
+                return true;
+            }
+        }
+    }
+
+    public start() {
+        this.started = true;
+    }
+
+    public stop() {
+        this.started = false;
+    }
+
     public tick(){
+        if (!this.started) {
+            return;
+        }
+
         if (this.pause) {
+            return;
+        }
+
+        if (this.is_lost()) {
+            this.game_over = true;
             return;
         }
 
@@ -164,8 +223,10 @@ class TetrisGame {
         else {
             this.down();
         }
-        const score = this.lines_score(this.check_lines())
-        console.log(score);
+        const okLines = this.check_lines();
+        const score = this.lines_score(okLines);
+        this.remove_lines(okLines);
+        this.score += score;
     }
 
     public rotate() {

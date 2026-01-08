@@ -30,7 +30,47 @@ export class TetrisView {
         this.cellSize = this.context.canvas.width / GRID_WIDTH;
     }
 
+    public draw_text(text: string, font_size_px: number, char_len = 5) {
+        this.context.fillStyle = "#FFF";
+        this.context.font = `${font_size_px}px Arial`;
+        this.context.fillText(text, (this.context.canvas.width / 2) - (text.length * char_len) , 80);
+    }
+
+    public draw_tuto() {
+        let text = "Tetris"
+        this.context.fillStyle = "#FFF";
+        this.context.font = `20px Arial`;
+        this.context.fillText(text, (this.context.canvas.width / 2) - (text.length * 5), 80);
+
+        this.context.font = `12px Arial`;
+        text = "Barre d'espace";
+        this.context.fillText(text, (this.context.canvas.width / 2) - (text.length * 3), 100);
+
+        text = "pour lancer la partie"
+        this.context.fillText(text, (this.context.canvas.width / 2) - (text.length * 2.5), 110);
+
+    }
+
+    public draw_game_over() {
+        const game_over = "Game Over !";
+        this.draw_text(game_over, 20);
+    }
+
+    public draw_score(score: number) {
+        const scoreStr = `${score}`;
+        this.draw_text(scoreStr, 25);
+    }
+
     public draw_current_game(state: TetrisState) {
+        if (!state.started) {
+            this.draw_tuto();
+            return;
+        }
+        if (state.game_over) {
+            this.draw_game_over();
+            return;
+        }
+        this.draw_score(state.score);
         for (let i = 0; i < state.cells.length; i++) {
             for (let j = 0; j < state.cells[i].length; j++) {
                 if (state.cells[i][j] != false) {

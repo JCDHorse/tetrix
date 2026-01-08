@@ -1,6 +1,9 @@
 # Tetrix
 Un clone de Tetris en Typescript avec Electron
 
+## Prérequis
+- npm
+
 ## Installation des dépendances
 ```shell
 npm install
